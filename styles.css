@@ -1,8 +1,63 @@
-/*
+/* OpDoc AI Auto Organizer */
 
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
+.opdoc-textarea {
+	height: 120px;
+}
 
-If your plugin does not need CSS, delete this file.
+.opdoc-funding {
+	margin-top: 2em;
+	padding-top: 1em;
+	border-top: 1px solid var(--background-modifier-border);
+	text-align: center;
+	opacity: 0.8;
+}
 
-*/
+.opdoc-funding p {
+	margin-bottom: 0.5em;
+}
+
+.opdoc-funding a {
+	color: var(--interactive-accent);
+}
+
+/* Onboarding modal */
+.opdoc-onboarding {
+	max-width: 520px;
+}
+
+.opdoc-onboarding-steps {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 1.5em;
+}
+
+.opdoc-onboarding-step {
+	flex: 1;
+	height: 4px;
+	border-radius: 2px;
+	background: var(--background-modifier-border);
+}
+
+.opdoc-onboarding-step.active {
+	background: var(--interactive-accent);
+}
+
+.opdoc-onboarding-step.completed {
+	background: var(--text-success);
+}
+
+.opdoc-status {
+	display: inline-block;
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	margin-right: 6px;
+}
+
+.opdoc-status.active {
+	background: var(--text-success);
+}
+
+.opdoc-status.inactive {
+	background: var(--text-faint);
+}
