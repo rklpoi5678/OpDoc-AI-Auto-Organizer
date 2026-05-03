@@ -1,90 +1,110 @@
-# Obsidian Sample Plugin
+# OpDoc AI Auto Organizer
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+Automatically organize your Obsidian vault with AI. OpDoc watches your inbox folder, analyzes new markdown files using AI (Ollama or OpenAI), assigns tags via frontmatter, and moves them to the right folder.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+## How It Works
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open modal (simple)" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+1. Drop a `.md` file into your **Inbox** folder
+2. OpDoc reads the content and sends it to your configured AI provider
+3. AI determines the best target folder and relevant tags
+4. OpDoc writes tags into frontmatter and moves the file
+5. Every action is logged to `OpDoc-Log.md`
 
-## First time developing plugins?
+## Features
 
-Quick starting guide for new plugin devs:
+- **Dual AI backend** — Ollama (local, free) or OpenAI (cloud, API key required)
+- **Embedding-based folder matching** — uses vector similarity to match new files against existing folder content
+- **6-step onboarding wizard** — guided setup on first launch
+- **Automatic + manual processing** — processes on file creation, periodic scan every 5 minutes, and a manual command
+- **Tag injection via frontmatter** — uses `processFrontMatter` API, no regex hacks
+- **Retry with backoff** — up to 3 retries with exponential backoff on failure
+- **Catch-up on startup** — processes any files left in inbox after restart
+- **Activity log** — `OpDoc-Log.md` table with original path, target path, status, tags, processing time, errors
+- **Error classification** — Korean user-facing error messages for common failures (Ollama down, invalid API key, rate limit, network errors)
+- **File collision resolution** — appends `_1` through `_100`, then timestamp fallback
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+## Setup
 
-## Releasing new releases
+### Requirements
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+- Obsidian v1.5.0+
+- **For local AI:** [Ollama](https://ollama.ai) running locally (e.g., `llama3.2` for analysis, `nomic-embed-text` for embeddings)
+- **For cloud AI:** OpenAI API key
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+### Install
 
-## Adding your plugin to the community plugin list
+1. Copy `main.js`, `styles.css`, `manifest.json` into your vault's `.obsidian/plugins/opdoc-ai-auto-organizer/` directory
+2. Enable the plugin in Obsidian Settings → Community Plugins
+3. The onboarding wizard will launch automatically on first activation
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+### Ollama Setup
 
-## How to use
+```bash
+# Install Ollama (https://ollama.ai)
+ollama pull llama3.2
+ollama pull nomic-embed-text
+ollama serve
+```
 
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
+OpDoc will auto-detect Ollama at `http://localhost:11434` during onboarding.
 
-## Manually installing the plugin
+## Commands
 
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
+| Command | Description |
+|---------|-------------|
+| `Process inbox now` | Manually trigger inbox scan and processing |
+| `Rebuild embedding cache` | Rebuild folder embeddings for similarity matching |
 
-## Improve code quality with eslint
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- This project already has eslint preconfigured, you can invoke a check by running`npm run lint`
-- Together with a custom eslint [plugin](https://github.com/obsidianmd/eslint-plugin) for Obsidan specific code guidelines.
-- A GitHub action is preconfigured to automatically lint every commit on all branches.
+## Settings
 
-## Funding URL
+| Setting | Default | Description |
+|---------|---------|-------------|
+| Inbox folder | `Inbox` | Source folder for unprocessed files |
+| Processing delay | Immediate | Delay before processing new files |
+| AI provider | Ollama | `ollama` or `openai` |
+| AI model | `llama3.2` | Chat model for file analysis |
+| Embedding provider | Ollama Local | `ollama_local` or `openai_cloud` |
+| Embedding model | `nomic-embed-text` | Model for vector embeddings |
+| Similarity threshold | `0.6` | Minimum cosine similarity for folder suggestion |
+| Custom instructions | (empty) | Additional instructions for AI analysis |
+| Activity logging | Enabled | Write processing results to `OpDoc-Log.md` |
 
-You can include funding URLs where people who use your plugin can financially support it.
+## Privacy
 
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
+OpDoc never sends data to any third-party server. All processing goes directly from your Obsidian client to your configured AI provider (local Ollama or your own OpenAI API key). No telemetry, no analytics, no phone-home.
+
+## Development
+
+```bash
+npm install
+npm run dev        # watch mode
+npm run build      # production build
+npm run lint       # ESLint check
+```
+
+## Releasing
+
+- Update `manifest.json` with the new version number and minimum Obsidian version
+- Update `versions.json` with `"new-version": "minimum-obsidian-version"` so older Obsidian builds can download a compatible version
+- Create a GitHub release using the version number as the tag (no `v` prefix)
+- Upload `manifest.json`, `main.js`, `styles.css` as release assets
+
+> Run `npm version patch|minor|major` after updating `minAppVersion` in `manifest.json` to bump version across all files.
+
+## Submitting to the Community Plugin List
+
+- Review the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines)
+- Publish an initial release with `README.md` in the repo root
+- Open a pull request at [obsidianmd/obsidian-releases](https://github.com/obsidianmd/obsidian-releases) adding your plugin to `community-plugins.json`:
 
 ```json
 {
-    "fundingUrl": "https://buymeacoffee.com"
+    "id": "opdoc-ai-auto-organizer",
+    "name": "OpDoc AI Auto Organizer",
+    "author": "hey_yoon",
+    "description": "Auto-organize markdown files using AI analysis. Tags and moves files from inbox to appropriate folders.",
+    "repo": "<your-github-username>/OpDoc-AI-Auto-Organizer"
 }
 ```
 
-If you have multiple URLs, you can also do:
-
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://docs.obsidian.md
+- Once admitted, announce in the [Obsidian forum showcase](https://forum.obsidian.md) and the `#updates` channel on [Discord](https://discord.gg/obsidianmd) (requires developer role)
