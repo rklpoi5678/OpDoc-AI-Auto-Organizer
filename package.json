@@ -1,7 +1,7 @@
 {
-	"name": "obsidian-sample-plugin",
-	"version": "1.0.0",
-	"description": "This is a sample plugin for Obsidian (https://obsidian.md)",
+	"name": "opdoc-ai-auto-organizer",
+	"version": "0.1.0",
+	"description": "Auto-organize markdown files using AI analysis for Obsidian",
 	"main": "main.js",
 	"type": "module",
 	"scripts": {
