@@ -4,10 +4,10 @@
 	"version": "0.1.0",
 	"minAppVersion": "1.5.0",
 	"description": "Auto-organize markdown files using AI analysis. Tags and moves files from inbox to appropriate folders.",
-	"author": "0091",
-	"authorUrl": "https://github.com/0091",
+	"author": "hey_yoon",
+	"authorUrl": "https://github.com/rklpoi5678",
 	"fundingUrl": {
-		"Buy Me a Coffee": "https://www.buymeacoffee.com/0091"
+		"Buy Me a Coffee": "https://ko-fi.com/yoongkim?hidefeed=true&widget=true&embed=true&preview=true"
 	},
 	"isDesktopOnly": true
 }
