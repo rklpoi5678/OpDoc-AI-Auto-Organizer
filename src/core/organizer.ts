@@ -36,7 +36,8 @@ export class FileOrganizer {
 			const embeddingProvider = createEmbeddingProvider(this.settings);
 			const queryVector = await embeddingProvider.getEmbedding(content.slice(0, 2000));
 
-			let targetFolder = analysis.targetFolder;
+			let targetFolder = analysis.targetFolder.replace(/^\/+/, "").trim();
+			if (!targetFolder) targetFolder = "Uncategorized";
 
 			const suggestion = this.cache.suggestFolder(queryVector);
 			if (suggestion && suggestion.similarity > analysis.confidence) {
