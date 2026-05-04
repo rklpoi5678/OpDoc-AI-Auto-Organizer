@@ -79,6 +79,12 @@ export class OpenAIProvider implements AIProvider, EmbeddingProvider {
 		return `You are a document organizer. Analyze this markdown file and determine the best folder and tags.
 Available folders: ${folders}${rules}
 
+Rules:
+- targetFolder must NOT start with "/"
+- Preserve the original language of folder names (Korean, English, Chinese, etc.)
+- If no existing folder matches, create a concise new folder name
+- Use underscores for multi-word folder names (e.g. "AI_Research")
+
 Respond in JSON: { "targetFolder": "...", "tags": ["..."], "confidence": 0.0-1.0 }`;
 	}
 }
