@@ -42,7 +42,14 @@ export async function ensureFolder(
 	if (existing instanceof TFolder) {
 		return existing;
 	}
-	await vault.createFolder(folderPath);
+	try {
+		await vault.createFolder(folderPath);
+	} catch {
+		// Race condition: another process may have created it
+		const afterCreate = vault.getAbstractFileByPath(folderPath);
+		if (afterCreate instanceof TFolder) return afterCreate;
+		throw new Error(`Failed to create folder: ${folderPath}`);
+	}
 	const created = vault.getAbstractFileByPath(folderPath);
 	if (created instanceof TFolder) return created;
 	throw new Error(`Failed to create folder: ${folderPath}`);
