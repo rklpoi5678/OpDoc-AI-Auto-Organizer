@@ -2,6 +2,7 @@ import type { App, TFile } from "obsidian";
 import type { OpDocSettings, ProcessingResult } from "../types";
 import { createAIProvider, createEmbeddingProvider } from "../ai/provider";
 import { FolderEmbeddingCache } from "./cache";
+import type { VaultIndexer } from "./indexer";
 import { ensureFolder, resolveNameCollision } from "../utils/helpers";
 import { OpDocLogger } from "../utils/logger";
 import { classifyError, showErrorNotice } from "../utils/error";
@@ -10,11 +11,13 @@ export class FileOrganizer {
 	readonly app: App;
 	private settings: OpDocSettings;
 	private cache: FolderEmbeddingCache;
+	private indexer: VaultIndexer;
 
-	constructor(app: App, settings: OpDocSettings, cache: FolderEmbeddingCache) {
+	constructor(app: App, settings: OpDocSettings, cache: FolderEmbeddingCache, indexer: VaultIndexer) {
 		this.app = app;
 		this.settings = settings;
 		this.cache = cache;
+		this.indexer = indexer;
 	}
 
 	async processFile(file: TFile): Promise<ProcessingResult> {
@@ -25,12 +28,12 @@ export class FileOrganizer {
 			const content = await this.app.vault.read(file);
 
 			const aiProvider = createAIProvider(this.settings);
-			const knownFolders = this.cache.getKnownFolders();
+			const vaultContext = this.indexer.buildContextText();
 
 			const analysis = await aiProvider.analyzeFile(
 				content,
 				this.settings.customInstructions,
-				knownFolders,
+				vaultContext,
 			);
 
 			const embeddingProvider = createEmbeddingProvider(this.settings);
@@ -46,7 +49,7 @@ export class FileOrganizer {
 
 			await this.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
 				const rawTags = fm.tags;
-					const existing: string[] = Array.isArray(rawTags) ? rawTags as string[] : [];
+				const existing: string[] = Array.isArray(rawTags) ? rawTags as string[] : [];
 				const newTags = analysis.tags.filter((t) => !existing.includes(t));
 				fm.tags = [...existing, ...newTags];
 			});
@@ -60,6 +63,7 @@ export class FileOrganizer {
 			await this.app.fileManager.renameFile(file, targetPath);
 
 			void this.cache.updateFolderEmbedding(targetFolder);
+			void this.indexer.updateFolder(targetFolder);
 
 			const result: ProcessingResult = {
 				originalPath: file.path,

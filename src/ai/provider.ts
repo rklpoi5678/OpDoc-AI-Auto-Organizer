@@ -6,7 +6,7 @@ export interface AIProvider {
 	analyzeFile(
 		content: string,
 		customInstructions: string,
-		folderList: string[],
+		vaultContext: string,
 	): Promise<AIAnalysisResult>;
 }
 

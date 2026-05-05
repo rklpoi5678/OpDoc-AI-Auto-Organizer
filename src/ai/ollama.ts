@@ -13,9 +13,9 @@ export class OllamaProvider implements AIProvider, EmbeddingProvider {
 	async analyzeFile(
 		content: string,
 		customInstructions: string,
-		folderList: string[],
+		vaultContext: string,
 	): Promise<AIAnalysisResult> {
-		const systemPrompt = this.buildSystemPrompt(folderList, customInstructions);
+		const systemPrompt = this.buildSystemPrompt(vaultContext, customInstructions);
 		const truncatedContent = content.substring(0, 4000);
 
 		try {
@@ -66,19 +66,23 @@ export class OllamaProvider implements AIProvider, EmbeddingProvider {
 		}
 	}
 
-	private buildSystemPrompt(folderList: string[], customInstructions: string): string {
-		const folders = folderList.join(", ");
+	private buildSystemPrompt(vaultContext: string, customInstructions: string): string {
 		const rules = customInstructions ? `\nUser rules: ${customInstructions}` : "";
 
-		return `You are a document organizer. Analyze this markdown file and determine the best folder and tags.
-Available folders: ${folders}${rules}
+		return `You are a document organizer for an Obsidian vault. Analyze the given markdown file and decide the best folder and tags.
 
-Rules:
-- targetFolder must NOT start with "/"
-- Preserve the original language of folder names (Korean, English, Chinese, etc.)
-- If no existing folder matches, create a concise new folder name
-- Use underscores for multi-word folder names (e.g. "AI_Research")
+${vaultContext}${rules}
 
-Respond in JSON: { "targetFolder": "...", "tags": ["..."], "confidence": 0.0-1.0 }`;
+Decision rules:
+- ALWAYS prefer an existing folder from the vault structure above. Match by topic similarity.
+- Only create a new folder when NO existing folder is a reasonable match.
+- targetFolder must NOT start with "/". Use a simple relative path like "Tech/React".
+- Preserve the original language of folder names (Korean, English, Chinese, etc.).
+- Use underscores for multi-word folder names (e.g. "AI_Research").
+- tags should be concise, lowercase, underscore-separated (e.g. "react", "job_search").
+- confidence: 0.0-1.0 — how certain you are about the folder choice.
+
+Respond in JSON only:
+{ "targetFolder": "...", "tags": ["..."], "confidence": 0.0-1.0 }`;
 	}
 }
