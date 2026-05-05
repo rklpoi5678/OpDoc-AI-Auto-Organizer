@@ -3,7 +3,7 @@ import type { OpDocSettings, ProcessingResult } from "../types";
 import { createAIProvider, createEmbeddingProvider } from "../ai/provider";
 import { FolderEmbeddingCache } from "./cache";
 import type { VaultIndexer } from "./indexer";
-import { ensureFolder, resolveNameCollision } from "../utils/helpers";
+import { ensureFolder, resolveNameCollision, resolveToExistingFolder } from "../utils/helpers";
 import { OpDocLogger } from "../utils/logger";
 import { classifyError, showErrorNotice } from "../utils/error";
 
@@ -27,6 +27,12 @@ export class FileOrganizer {
 		try {
 			const content = await this.app.vault.read(file);
 
+			const embeddingProvider = createEmbeddingProvider(this.settings);
+			const queryVector = await embeddingProvider.getEmbedding(content.slice(0, 2000));
+
+			const candidates = this.cache.suggestTopK(queryVector, 5);
+			const candidateFolders = candidates.map((c) => c.folder);
+
 			const aiProvider = createAIProvider(this.settings);
 			const vaultContext = this.indexer.buildContextText();
 
@@ -34,18 +40,14 @@ export class FileOrganizer {
 				content,
 				this.settings.customInstructions,
 				vaultContext,
+				candidateFolders.length > 0 ? candidateFolders : undefined,
 			);
-
-			const embeddingProvider = createEmbeddingProvider(this.settings);
-			const queryVector = await embeddingProvider.getEmbedding(content.slice(0, 2000));
 
 			let targetFolder = analysis.targetFolder.replace(/^\/+/, "").trim();
 			if (!targetFolder) targetFolder = "Uncategorized";
 
-			const suggestion = this.cache.suggestFolder(queryVector);
-			if (suggestion && suggestion.similarity > analysis.confidence) {
-				targetFolder = suggestion.folder;
-			}
+			const knownFolders = this.indexer.getKnownFolders();
+			targetFolder = resolveToExistingFolder(targetFolder, knownFolders);
 
 			await this.app.fileManager.processFrontMatter(file, (fm: Record<string, unknown>) => {
 				const rawTags = fm.tags;

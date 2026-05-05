@@ -55,6 +55,28 @@ export async function ensureFolder(
 	throw new Error(`Failed to create folder: ${folderPath}`);
 }
 
+export function resolveToExistingFolder(
+	targetFolder: string,
+	knownFolders: string[],
+): string {
+	if (knownFolders.includes(targetFolder)) return targetFolder;
+
+	const lower = targetFolder.toLowerCase();
+	const exactIgnoreCase = knownFolders.find((f) => f.toLowerCase() === lower);
+	if (exactIgnoreCase) return exactIgnoreCase;
+
+	const targetSegments = targetFolder.split("/");
+	for (const folder of knownFolders) {
+		const folderSegments = folder.split("/");
+		if (folderSegments.length !== targetSegments.length) continue;
+		if (folderSegments.every((s, i) => s.toLowerCase() === (targetSegments[i] ?? "").toLowerCase())) {
+			return folder;
+		}
+	}
+
+	return targetFolder;
+}
+
 export function getFilesInFolder(vault: Vault, folderPath: string): TFile[] {
 	const folder = vault.getAbstractFileByPath(folderPath);
 	if (!(folder instanceof TFolder)) return [];

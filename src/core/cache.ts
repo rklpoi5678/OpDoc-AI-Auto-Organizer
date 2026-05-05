@@ -108,6 +108,20 @@ export class FolderEmbeddingCache {
 		return null;
 	}
 
+	suggestTopK(queryVector: number[], k: number = 5): Array<{ folder: string; similarity: number }> {
+		const results: Array<{ folder: string; similarity: number }> = [];
+
+		for (const [folder, embedding] of Object.entries(this.cache)) {
+			const sim = cosineSimilarity(queryVector, embedding.vector);
+			if (sim >= this.settings.similarityThreshold) {
+				results.push({ folder, similarity: sim });
+			}
+		}
+
+		results.sort((a, b) => b.similarity - a.similarity);
+		return results.slice(0, k);
+	}
+
 	getKnownFolders(): string[] {
 		return Object.keys(this.cache);
 	}

@@ -14,8 +14,9 @@ export class OllamaProvider implements AIProvider, EmbeddingProvider {
 		content: string,
 		customInstructions: string,
 		vaultContext: string,
+		candidates?: string[],
 	): Promise<AIAnalysisResult> {
-		const systemPrompt = this.buildSystemPrompt(vaultContext, customInstructions);
+		const systemPrompt = this.buildSystemPrompt(vaultContext, customInstructions, candidates);
 		const truncatedContent = content.substring(0, 4000);
 
 		try {
@@ -66,16 +67,21 @@ export class OllamaProvider implements AIProvider, EmbeddingProvider {
 		}
 	}
 
-	private buildSystemPrompt(vaultContext: string, customInstructions: string): string {
+	private buildSystemPrompt(vaultContext: string, customInstructions: string, candidates?: string[]): string {
 		const rules = customInstructions ? `\nUser rules: ${customInstructions}` : "";
+
+		const candidateList = candidates && candidates.length > 0
+			? `\n\nSuggested existing folders (prefer one of these):\n${candidates.map((f, i) => `${i + 1}. ${f}`).join("\n")}`
+			: "";
 
 		return `You are a document organizer for an Obsidian vault. Analyze the given markdown file and decide the best folder and tags.
 
-${vaultContext}${rules}
+${vaultContext}${rules}${candidateList}
 
 Decision rules:
-- ALWAYS prefer an existing folder from the vault structure above. Match by topic similarity.
-- Only create a new folder when NO existing folder is a reasonable match.
+- You MUST return one of the existing folders listed above if any is a reasonable match.
+- Only suggest a new folder when NONE of the listed folders match the content.
+- Copy the folder path EXACTLY as shown — same casing, same separators.
 - targetFolder must NOT start with "/". Use a simple relative path like "Tech/React".
 - Preserve the original language of folder names (Korean, English, Chinese, etc.).
 - Use underscores for multi-word folder names (e.g. "AI_Research").

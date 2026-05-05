@@ -7,6 +7,7 @@ export interface AIProvider {
 		content: string,
 		customInstructions: string,
 		vaultContext: string,
+		candidates?: string[],
 	): Promise<AIAnalysisResult>;
 }
 
