@@ -2,23 +2,46 @@ import { TFile, type Vault } from "obsidian";
 import type { ProcessingResult } from "../types";
 
 const LOG_FILE_PATH = "OpDoc-Log.md";
-const TABLE_HEADER =
-	"| 원본 경로 | 이동 경로 | 상태 | 태그 | 처리 시간 | 에러 | 타임스탬프 |\n|-----------|----------|------|------|----------|------|-----------|";
 const HEADER_LINE_COUNT = 4;
+
+const LOG_HEADERS: Record<string, { title: string; columns: string; separator: string }> = {
+	ko: {
+		title: "# OpDoc 활동 로그",
+		columns: "| 원본 경로 | 이동 경로 | 상태 | 태그 | 처리 시간 | 에러 | 타임스탬프 |",
+		separator: "|-----------|----------|------|------|----------|------|-----------|",
+	},
+	en: {
+		title: "# OpDoc Activity Log",
+		columns: "| Source Path | Target Path | Status | Tags | Processing Time | Error | Timestamp |",
+		separator: "|-------------|-------------|--------|------|----------------|-------|-----------|",
+	},
+	zh: {
+		title: "# OpDoc 活动日志",
+		columns: "| 原始路径 | 目标路径 | 状态 | 标签 | 处理时间 | 错误 | 时间戳 |",
+		separator: "|---------|---------|------|------|---------|------|--------|",
+	},
+};
+
+function getLogHeader(lang: string): string {
+	const header = LOG_HEADERS[lang] ?? LOG_HEADERS["ko"]!;
+	return `${header.title}\n\n${header.columns}\n${header.separator}\n`;
+}
 
 export class OpDocLogger {
 	private vault: Vault;
 	private maxEntries: number;
+	private lang: string;
 
-	constructor(vault: Vault, maxEntries: number = 200) {
+	constructor(vault: Vault, maxEntries: number = 200, lang: string = "ko") {
 		this.vault = vault;
 		this.maxEntries = maxEntries;
+		this.lang = lang;
 	}
 
 	async ensureLogFile(): Promise<void> {
 		const existing = this.vault.getAbstractFileByPath(LOG_FILE_PATH);
 		if (!existing) {
-			await this.vault.create(LOG_FILE_PATH, `# OpDoc Activity Log\n\n${TABLE_HEADER}\n`);
+			await this.vault.create(LOG_FILE_PATH, getLogHeader(this.lang));
 		}
 	}
 
