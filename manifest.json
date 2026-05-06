@@ -3,7 +3,7 @@
 	"name": "OpDoc AI Auto Organizer",
 	"version": "0.1.0",
 	"minAppVersion": "1.5.0",
-	"description": "Auto-organize markdown files using AI analysis. Tags and moves files from inbox to appropriate folders.",
+	"description": "Zero-cloud, privacy-first note organizer. Drop files in your Inbox, and let local AI (Ollama) automatically tag and move them to the right folders.",
 	"author": "hey_yoon",
 	"authorUrl": "https://github.com/rklpoi5678",
 	"fundingUrl": {
