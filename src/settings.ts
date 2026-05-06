@@ -3,6 +3,7 @@ import type OpDocPlugin from "./main";
 import {
 	AIProviderType,
 	EmbeddingProviderType,
+	OrganizingMethodology,
 	ProcessingDelay,
 } from "./types";
 
@@ -20,6 +21,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 
 		this.renderInboxSection(containerEl);
 		this.renderProcessingSection(containerEl);
+		this.renderMethodologySection(containerEl);
 		this.renderAIProviderSection(containerEl);
 		this.renderEmbeddingSection(containerEl);
 		this.renderCustomInstructionsSection(containerEl);
@@ -59,6 +61,26 @@ export class OpDocSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.processingDelay =
 							value as ProcessingDelay;
+						await this.plugin.saveSettings();
+					}),
+			);
+	}
+
+	private renderMethodologySection(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName("Organizing methodology")
+			.setDesc("Choose a file organization philosophy for the AI to follow")
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOptions({
+						[OrganizingMethodology.NONE]: "None (AI decides freely)",
+						[OrganizingMethodology.PARA]: "PARA — Projects, Areas, Resources, Archives",
+						[OrganizingMethodology.MECE]: "MECE — Mutually Exclusive, Collectively Exhaustive",
+						[OrganizingMethodology.JOHNNY_DECIMAL]: "Johnny.Decimal — Numbered index system",
+					})
+					.setValue(this.plugin.settings.methodology)
+					.onChange(async (value) => {
+						this.plugin.settings.methodology = value as OrganizingMethodology;
 						await this.plugin.saveSettings();
 					}),
 			);
@@ -264,6 +286,32 @@ export class OpDocSettingTab extends PluginSettingTab {
 						this.plugin.settings.activityLogging = value;
 						await this.plugin.saveSettings();
 					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Max log entries")
+			.setDesc("Oldest entries are auto-trimmed when limit is exceeded")
+			.addSlider((slider) =>
+				slider
+					.setLimits(50, 1000, 50)
+					.setValue(this.plugin.settings.maxLogEntries)
+					.setDynamicTooltip()
+					.onChange(async (value) => {
+						this.plugin.settings.maxLogEntries = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Clear log")
+			.setDesc("Delete all OpDoc-Log.md entries")
+			.addButton((button) =>
+				button.setButtonText("Clear log").onClick(async () => {
+					const file = this.app.vault.getAbstractFileByPath("OpDoc-Log.md");
+					if (file) {
+						await this.app.fileManager.trashFile(file);
+					}
+				}),
 			);
 	}
 
