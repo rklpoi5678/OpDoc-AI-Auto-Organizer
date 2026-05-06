@@ -3,6 +3,7 @@ import type OpDocPlugin from "./main";
 import {
 	AIProviderType,
 	EmbeddingProviderType,
+	OrganizingMethodology,
 	ProcessingDelay,
 } from "./types";
 
@@ -20,6 +21,8 @@ export class OpDocSettingTab extends PluginSettingTab {
 
 		this.renderInboxSection(containerEl);
 		this.renderProcessingSection(containerEl);
+		this.renderLanguageSection(containerEl);
+		this.renderMethodologySection(containerEl);
 		this.renderAIProviderSection(containerEl);
 		this.renderEmbeddingSection(containerEl);
 		this.renderCustomInstructionsSection(containerEl);
@@ -59,6 +62,52 @@ export class OpDocSettingTab extends PluginSettingTab {
 					.onChange(async (value) => {
 						this.plugin.settings.processingDelay =
 							value as ProcessingDelay;
+						await this.plugin.saveSettings();
+					}),
+			);
+	}
+
+	private renderLanguageSection(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName("Language / 언어")
+			.setDesc("Affects log file header language")
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOptions({
+						"ko": "한국어",
+						"en": "English",
+						"zh": "中文",
+					})
+					.setValue(this.plugin.settings.language)
+					.onChange(async (value) => {
+						this.plugin.settings.language = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+	}
+
+	private renderMethodologySection(containerEl: HTMLElement): void {
+		new Setting(containerEl)
+			.setName("Organizing methodology")
+			.setDesc(
+				"Choose a file organization philosophy for the AI to follow",
+			)
+			.addDropdown((dropdown) =>
+				dropdown
+					.addOptions({
+						[OrganizingMethodology.NONE]:
+							"None (AI decides freely)",
+						[OrganizingMethodology.PARA]:
+							"PARA — Projects, Areas, Resources, Archives",
+						[OrganizingMethodology.MECE]:
+							"MECE — Mutually Exclusive, Collectively Exhaustive",
+						[OrganizingMethodology.JOHNNY_DECIMAL]:
+							"Johnny.Decimal — Numbered index system",
+					})
+					.setValue(this.plugin.settings.methodology)
+					.onChange(async (value) => {
+						this.plugin.settings.methodology =
+							value as OrganizingMethodology;
 						await this.plugin.saveSettings();
 					}),
 			);
@@ -265,6 +314,33 @@ export class OpDocSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					}),
 			);
+
+		new Setting(containerEl)
+			.setName("Max log entries")
+			.setDesc("Oldest entries are auto-trimmed when limit is exceeded")
+			.addSlider((slider) =>
+				slider
+					.setLimits(50, 1000, 50)
+					.setValue(this.plugin.settings.maxLogEntries)
+					.setDynamicTooltip()
+					.onChange(async (value) => {
+						this.plugin.settings.maxLogEntries = value;
+						await this.plugin.saveSettings();
+					}),
+			);
+
+		new Setting(containerEl)
+			.setName("Clear log")
+			.setDesc("Delete all OpDoc-Log.md entries")
+			.addButton((button) =>
+				button.setButtonText("Clear log").onClick(async () => {
+					const file =
+						this.app.vault.getAbstractFileByPath("OpDoc-Log.md");
+					if (file) {
+						await this.app.fileManager.trashFile(file);
+					}
+				}),
+			);
 	}
 
 	private renderCacheSection(containerEl: HTMLElement): void {
@@ -301,6 +377,10 @@ export class OpDocSettingTab extends PluginSettingTab {
 		fundingEl.createEl("a", {
 			text: "buy me a coffee",
 			href: "https://ko-fi.com/yoongkim?hidefeed=true&widget=true&embed=true&preview=true",
+		});
+
+		fundingEl.createEl("p", {
+			text: "📧 Feedback & suggestions: rklpoi5678@gmail.com",
 		});
 	}
 }

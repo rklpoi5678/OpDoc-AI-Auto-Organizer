@@ -1,6 +1,7 @@
 import { requestUrl } from "obsidian";
 import type { AIAnalysisResult, OpDocSettings } from "../types";
 import type { AIProvider, EmbeddingProvider } from "./provider";
+import { getMethodologyRules } from "./provider";
 import { classifyError } from "../utils/error";
 
 export class OpenAIProvider implements AIProvider, EmbeddingProvider {
@@ -75,6 +76,8 @@ export class OpenAIProvider implements AIProvider, EmbeddingProvider {
 
 	private buildSystemPrompt(vaultContext: string, customInstructions: string, candidates?: string[]): string {
 		const rules = customInstructions ? `\nUser rules: ${customInstructions}` : "";
+		const methodologyBlock = getMethodologyRules(this.settings.methodology);
+		const methodologySection = methodologyBlock ? `\n\n${methodologyBlock}` : "";
 
 		const candidateList = candidates && candidates.length > 0
 			? `\n\nSuggested existing folders (prefer one of these):\n${candidates.map((f, i) => `${i + 1}. ${f}`).join("\n")}`
@@ -82,7 +85,7 @@ export class OpenAIProvider implements AIProvider, EmbeddingProvider {
 
 		return `You are a document organizer for an Obsidian vault. Analyze the given markdown file and decide the best folder and tags.
 
-${vaultContext}${rules}${candidateList}
+${vaultContext}${methodologySection}${rules}${candidateList}
 
 Decision rules:
 - You MUST return one of the existing folders listed above if any is a reasonable match.

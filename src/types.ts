@@ -25,6 +25,13 @@ export enum FileProcessingState {
 	FAILED = "failed",
 }
 
+export enum OrganizingMethodology {
+	NONE = "none",
+	PARA = "para",
+	MECE = "mece",
+	JOHNNY_DECIMAL = "johnny_decimal",
+}
+
 // ── Settings ──
 
 export interface OpDocSettings {
@@ -41,6 +48,9 @@ export interface OpDocSettings {
 	activityLogging: boolean;
 	onboardingComplete: boolean;
 	similarityThreshold: number;
+	methodology: OrganizingMethodology;
+	maxLogEntries: number;
+	language: string;
 }
 
 export const DEFAULT_SETTINGS: OpDocSettings = {
@@ -57,6 +67,9 @@ export const DEFAULT_SETTINGS: OpDocSettings = {
 	activityLogging: true,
 	onboardingComplete: false,
 	similarityThreshold: 0.6,
+	methodology: OrganizingMethodology.NONE,
+	maxLogEntries: 200,
+	language: "ko",
 };
 
 // ── Processing Queue ──

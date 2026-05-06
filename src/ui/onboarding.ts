@@ -650,6 +650,7 @@ export class OnboardingModal extends Modal {
 	private async finishOnboarding(): Promise<void> {
 		Object.assign(this.plugin.settings, {
 			...this.wizardData,
+			language: this.lang,
 			onboardingComplete: true,
 		});
 		await this.plugin.saveSettings();
