@@ -50,6 +50,7 @@ export interface OpDocSettings {
 	similarityThreshold: number;
 	methodology: OrganizingMethodology;
 	maxLogEntries: number;
+	language: string;
 }
 
 export const DEFAULT_SETTINGS: OpDocSettings = {
@@ -68,6 +69,7 @@ export const DEFAULT_SETTINGS: OpDocSettings = {
 	similarityThreshold: 0.6,
 	methodology: OrganizingMethodology.NONE,
 	maxLogEntries: 200,
+	language: "ko",
 };
 
 // ── Processing Queue ──
