@@ -78,7 +78,7 @@ export class FileOrganizer {
 			};
 
 			if (this.settings.activityLogging) {
-				const logger = new OpDocLogger(this.app.vault);
+				const logger = new OpDocLogger(this.app.vault, this.settings.maxLogEntries);
 				void logger.logEntry(result);
 			}
 
@@ -98,7 +98,7 @@ export class FileOrganizer {
 			};
 
 			if (this.settings.activityLogging) {
-				const logger = new OpDocLogger(this.app.vault);
+				const logger = new OpDocLogger(this.app.vault, this.settings.maxLogEntries);
 				void logger.logEntry(result);
 			}
 
