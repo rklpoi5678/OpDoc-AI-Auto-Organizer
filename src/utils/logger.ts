@@ -4,12 +4,15 @@ import type { ProcessingResult } from "../types";
 const LOG_FILE_PATH = "OpDoc-Log.md";
 const TABLE_HEADER =
 	"| 원본 경로 | 이동 경로 | 상태 | 태그 | 처리 시간 | 에러 | 타임스탬프 |\n|-----------|----------|------|------|----------|------|-----------|";
+const HEADER_LINE_COUNT = 4;
 
 export class OpDocLogger {
 	private vault: Vault;
+	private maxEntries: number;
 
-	constructor(vault: Vault) {
+	constructor(vault: Vault, maxEntries: number = 200) {
 		this.vault = vault;
+		this.maxEntries = maxEntries;
 	}
 
 	async ensureLogFile(): Promise<void> {
@@ -30,7 +33,16 @@ export class OpDocLogger {
 		const row = `| ${result.originalPath} | ${result.targetPath ?? "-"} | ${statusIcon} | ${tags} | ${result.processingTime.toFixed(1)}s | ${result.error ?? "-"} | ${result.timestamp} |`;
 
 		const content = await this.vault.read(file);
-		const updated = content + row + "\n";
+		const lines = content.split("\n");
+		const dataLines = lines.slice(HEADER_LINE_COUNT);
+		dataLines.push(row);
+
+		while (dataLines.length > this.maxEntries) {
+			dataLines.shift();
+		}
+
+		const header = lines.slice(0, HEADER_LINE_COUNT).join("\n");
+		const updated = header + "\n" + dataLines.join("\n");
 		await this.vault.modify(file, updated);
 	}
 }
