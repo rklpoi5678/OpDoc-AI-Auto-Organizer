@@ -8,10 +8,10 @@ export function isInboxFile(file: TFile, inboxPath: string): boolean {
 	return file.parent?.path === inboxPath;
 }
 
-export async function resolveNameCollision(
+export function resolveNameCollision(
 	vault: Vault,
 	targetPath: string,
-): Promise<string> {
+): string {
 	if (!vault.getAbstractFileByPath(targetPath)) {
 		return targetPath;
 	}

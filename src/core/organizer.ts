@@ -57,7 +57,7 @@ export class FileOrganizer {
 			});
 
 			await ensureFolder(this.app.vault, targetFolder);
-			const targetPath = await resolveNameCollision(
+			const targetPath = resolveNameCollision(
 				this.app.vault,
 				`${targetFolder}/${file.name}`,
 			);

@@ -56,7 +56,7 @@ export default class OpDocPlugin extends Plugin {
 		this.rebuildEmbeddingCache = async () => {
 			await this.cache.rebuildAll();
 			await this.indexer.buildFull();
-			new Notice("[OpDoc] cache and index rebuilt");
+			new Notice("[OpDoc] Cache and index rebuilt");
 		};
 
 		this.registerEvent(
@@ -80,7 +80,7 @@ export default class OpDocPlugin extends Plugin {
 			name: "Process inbox now",
 			callback: () => {
 				this.processor.scanInbox(this.app.vault);
-				new Notice("[OpDoc] manual inbox processing triggered");
+				new Notice("[OpDoc] Manual inbox processing triggered");
 			},
 		});
 

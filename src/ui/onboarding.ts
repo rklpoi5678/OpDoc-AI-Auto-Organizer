@@ -289,7 +289,7 @@ export class OnboardingModal extends Modal {
 	}
 
 	onOpen(): void {
-		this.titleEl.setText("OpDoc Setup");
+		this.titleEl.setText("OpDoc setup");
 		this.renderStep();
 	}
 

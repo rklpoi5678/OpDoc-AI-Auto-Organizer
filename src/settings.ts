@@ -35,7 +35,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 	private renderInboxSection(containerEl: HTMLElement): void {
 		new Setting(containerEl)
 			.setName("Target inbox folder")
-			.setDesc("Folder to monitor for new markdown files")
+			.setDesc("Folder to monitor for new Markdown files")
 			.addText((text) =>
 				text
 					.setPlaceholder("Inbox")
@@ -135,7 +135,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 		if (this.plugin.settings.aiProvider === AIProviderType.OLLAMA) {
 			new Setting(containerEl)
 				.setName("Ollama endpoint")
-				.setDesc("Url of your local Ollama server")
+				.setDesc("URL of your local Ollama server")
 				.addText((text) =>
 					text
 						.setPlaceholder("http://localhost:11434")
@@ -178,7 +178,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 
 			new Setting(containerEl)
 				.setName("OpenAI endpoint")
-				.setDesc("Api base URL (change for compatible providers)")
+				.setDesc("API base URL (change for compatible providers)")
 				.addText((text) =>
 					text
 						.setPlaceholder("https://api.openai.com/v1")
@@ -191,7 +191,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 
 			new Setting(containerEl)
 				.setName("AI model")
-				.setDesc("Openai model for file analysis (e.g. gpt-4o-mini)")
+				.setDesc("OpenAI model for file analysis (e.g. gpt-4o-mini)")
 				.addText((text) =>
 					text
 						.setPlaceholder("gpt-4o-mini")
@@ -251,7 +251,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 		) {
 			new Setting(containerEl)
 				.setName("Embedding model")
-				.setDesc("Openai embedding model")
+				.setDesc("OpenAI embedding model")
 				.addDropdown((dropdown) =>
 					dropdown
 						.addOptions({
@@ -375,7 +375,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 			text: "☕ If OpDoc helps, buy the developer a cup of coffee!",
 		});
 		fundingEl.createEl("a", {
-			text: "buy me a coffee",
+			text: "Buy me a coffee",
 			href: "https://ko-fi.com/yoongkim?hidefeed=true&widget=true&embed=true&preview=true",
 		});
 
