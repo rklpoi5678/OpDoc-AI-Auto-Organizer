@@ -74,9 +74,9 @@ export class OpDocSettingTab extends PluginSettingTab {
 			.addDropdown((dropdown) =>
 				dropdown
 					.addOptions({
-						"ko": "한국어",
-						"en": "English",
-						"zh": "中文",
+						ko: "한국어",
+						en: "English",
+						zh: "中文",
 					})
 					.setValue(this.plugin.settings.language)
 					.onChange(async (value) => {
@@ -138,7 +138,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 				.setDesc("URL of your local Ollama server")
 				.addText((text) =>
 					text
-						.setPlaceholder("http://localhost:11434")
+						.setPlaceholder("E.g: http://localhost:11434")
 						.setValue(this.plugin.settings.ollamaEndpoint)
 						.onChange(async (value) => {
 							this.plugin.settings.ollamaEndpoint = value;
@@ -149,11 +149,11 @@ export class OpDocSettingTab extends PluginSettingTab {
 			new Setting(containerEl)
 				.setName("AI model")
 				.setDesc(
-					"Ollama model for file analysis (e.g. llama3.2, mistral)",
+					"Ollama model for file analysis (e.g: llama3.2, mistral)",
 				)
 				.addText((text) =>
 					text
-						.setPlaceholder("llama3.2")
+						.setPlaceholder("Llama3.2")
 						.setValue(this.plugin.settings.aiModel)
 						.onChange(async (value) => {
 							this.plugin.settings.aiModel = value;
@@ -168,7 +168,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 				.setDesc("Your OpenAI API key (stored locally only)")
 				.addText((text) => {
 					text.inputEl.type = "password";
-					text.setPlaceholder("sk-...")
+					text.setPlaceholder("Sk-...")
 						.setValue(this.plugin.settings.openaiApiKey)
 						.onChange(async (value) => {
 							this.plugin.settings.openaiApiKey = value;
@@ -191,10 +191,10 @@ export class OpDocSettingTab extends PluginSettingTab {
 
 			new Setting(containerEl)
 				.setName("AI model")
-				.setDesc("OpenAI model for file analysis (e.g. gpt-4o-mini)")
+				.setDesc("OpenAI model for file analysis")
 				.addText((text) =>
 					text
-						.setPlaceholder("gpt-4o-mini")
+						.setPlaceholder("E.g: gpt-4o-mini")
 						.setValue(this.plugin.settings.aiModel)
 						.onChange(async (value) => {
 							this.plugin.settings.aiModel = value;
@@ -232,11 +232,19 @@ export class OpDocSettingTab extends PluginSettingTab {
 			new Setting(containerEl)
 				.setName("Embedding model")
 				.setDesc(
-					"Local embedding model (run 'ollama pull nomic-embed-text')",
+					(() => {
+						const frag = new DocumentFragment();
+						frag.appendText("Local embedding model (e.g., run ");
+						frag.createEl("code", {
+							text: "Ollama pull nomic-embed-text",
+						});
+						frag.appendText(")");
+						return frag;
+					})(),
 				)
 				.addText((text) =>
 					text
-						.setPlaceholder("nomic-embed-text")
+						.setPlaceholder("E.g: nomic-embed-text")
 						.setValue(this.plugin.settings.embeddingModel)
 						.onChange(async (value) => {
 							this.plugin.settings.embeddingModel = value;
@@ -291,7 +299,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 			.setDesc("Rules for AI to follow when organizing files")
 			.addTextArea((text) => {
 				text.setPlaceholder(
-					"e.g. programming notes → Tech, diary → Daily",
+					"E.g: programming notes → tech, diary → daily",
 				)
 					.setValue(this.plugin.settings.customInstructions)
 					.onChange(async (value) => {
@@ -372,7 +380,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 	private renderFundingSection(containerEl: HTMLElement): void {
 		const fundingEl = containerEl.createDiv({ cls: "opdoc-funding" });
 		fundingEl.createEl("p", {
-			text: "☕ If OpDoc helps, buy the developer a cup of coffee!",
+			text: "☕ if this plugin helps your life, buy the developer a cup of coffee!",
 		});
 		fundingEl.createEl("a", {
 			text: "Buy me a coffee",
@@ -380,7 +388,7 @@ export class OpDocSettingTab extends PluginSettingTab {
 		});
 
 		fundingEl.createEl("p", {
-			text: "📧 Feedback & suggestions: rklpoi5678@gmail.com",
+			text: "📧 feedback & suggestions: rklpoi5678@gmail.com",
 		});
 	}
 }
