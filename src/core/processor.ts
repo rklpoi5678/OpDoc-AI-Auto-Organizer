@@ -68,7 +68,7 @@ export class FileProcessor {
 				item.state = FileProcessingState.FAILED;
 			} else {
 				const delay = BASE_DELAY_MS * Math.pow(2, item.retryCount - 1);
-				await new Promise((resolve) => setTimeout(resolve, delay));
+				await new Promise((resolve) => activeWindow.setTimeout(resolve, delay));
 			}
 		}
 
