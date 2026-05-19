@@ -782,7 +782,7 @@ export class OnboardingModal extends Modal {
 			tr.createEl("td", { text: row.value });
 		}
 
-		const tipEl = container.createEl("div", { cls: "opdoc-tip" });
+		const tipEl = container.createDiv({ cls: "opdoc-tip" });
 		tipEl.createEl("strong", { text: "Tip: " });
 		tipEl.createSpan({ text: t.completeTip });
 
