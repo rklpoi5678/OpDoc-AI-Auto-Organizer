@@ -1,6 +1,6 @@
 {
 	"name": "opdoc-ai-auto-organizer",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"description": "Auto-organize markdown files using AI analysis for Obsidian",
 	"main": "main.js",
 	"type": "module",

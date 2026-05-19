@@ -1,8 +1,8 @@
 {
 	"id": "opdoc-ai-auto-organizer",
 	"name": "OpDoc AI Auto Organizer",
-	"version": "0.1.0",
-	"minAppVersion": "1.5.0",
+	"version": "0.1.1",
+	"minAppVersion": "1.6.6",
 	"description": "Zero-cloud, privacy-first note organizer. Drop files in your Inbox, and let local AI (Ollama) automatically tag and move them to the right folders.",
 	"author": "hey_yoon",
 	"authorUrl": "https://github.com/rklpoi5678",
